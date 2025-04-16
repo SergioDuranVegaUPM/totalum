@@ -1,0 +1,123 @@
+<!-- Overlay -->
+<div class="overflow-y-scroll fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+
+    <!-- Formulario para crear pedidos -->
+    <form *ngIf="selectedTable === 'pedidos'" [formGroup]="itemForm" (ngSubmit)="onSubmit()"
+        class="mx-auto bg-slate-400 p-8">
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Primer conjunto de campos -->
+            <div *ngFor="let field of [
+            { id: 'numero_pedido', label: 'Número de pedido', type: 'text' },
+            { id: 'importe', label: 'Importe', type: 'number' },
+            { id: 'importe_impuestos', label: 'Importe con impuestos', type: 'number' }
+          ]" class="mb-5">
+                <label [for]="field.id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ field.label }}
+                </label>
+                <input [id]="field.id" [type]="field.type" [formControlName]="field.id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                   dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+
+            <!-- Segundo conjunto de campos -->
+            <div *ngFor="let field of [
+            { id: 'cantidad_productos', label: 'Cantidad de productos', type: 'number' },
+            { id: 'fecha', label: 'Fecha', type: 'date' },
+            { id: 'nombre_cliente', label: 'Nombre del cliente', type: 'text' }
+          ]" class="mb-5">
+                <label [for]="field.id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    {{ field.label }}
+                </label>
+                <input [id]="field.id" [type]="field.type" [formControlName]="field.id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                   focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                   dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                   dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center gap-2 mt-4">
+            <button type="submit" [disabled]="itemForm.invalid" [ngClass]="{
+            'bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700': itemForm.valid,
+            'bg-gray-800 dark:bg-gray-600 cursor-not-allowed': itemForm.invalid
+          }"
+                class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:focus:ring-blue-800 transition-all">
+                Crear Pedido
+            </button>
+
+            <button type="button" (click)="cerrar()"
+                class="bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition-all">
+                Cerrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Formulario para crear clientes -->
+    <form *ngIf="selectedTable === 'clientes'" [formGroup]="itemForm" (ngSubmit)="onSubmit()"
+        class="mx-auto bg-slate-400 p-8">
+        <div class="mb-5" *ngFor="let field of [
+          { id: 'nombre', label: 'Nombre', type: 'text' },
+          { id: 'fecha_nacimiento', label: 'Fecha de nacimiento', type: 'date' },
+          { id: 'email', label: 'Correo electrónico', type: 'email' },
+          { id: 'telefono', label: 'Teléfono', type: 'number' }
+        ]">
+            <label [for]="field.id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {{ field.label }}
+            </label>
+            <input [id]="field.id" [type]="field.type" [formControlName]="field.id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+        </div>
+
+        <div class="flex justify-between items-center gap-2 mt-4">
+            <button type="submit" [disabled]="itemForm.invalid" [ngClass]="{
+              'bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700': itemForm.valid,
+              'bg-gray-800 dark:bg-gray-600 cursor-not-allowed': itemForm.invalid
+            }"
+                class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:focus:ring-blue-800 transition-all">
+                Crear Cliente
+            </button>
+
+            <button type="button" (click)="cerrar()"
+                class="bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition-all">
+                Cerrar
+            </button>
+        </div>
+    </form>
+
+    <!-- Formulario para crear productos -->
+    <form *ngIf="selectedTable === 'productos'" [formGroup]="itemForm" (ngSubmit)="onSubmit()"
+        class="mx-auto bg-slate-400 p-8">
+        <div class="mb-5" *ngFor="let field of [
+          { id: 'nombre', label: 'Nombre del producto', type: 'text' },
+          { id: 'precio', label: 'Precio', type: 'number' },
+          { id: 'categoria', label: 'Categoría', type: 'text' },
+          { id: 'cantidad', label: 'Cantidad en inventario', type: 'number' }
+        ]">
+            <label [for]="field.id" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                {{ field.label }}
+            </label>
+            <input [id]="field.id" [type]="field.type" [formControlName]="field.id" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg 
+                 focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 
+                 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 
+                 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" />
+        </div>
+
+        <div class="flex justify-between items-center gap-2 mt-4">
+            <button type="submit" [disabled]="itemForm.invalid" [ngClass]="{
+              'bg-blue-700 hover:bg-blue-800 dark:bg-blue-600 dark:hover:bg-blue-700': itemForm.valid,
+              'bg-gray-800 dark:bg-gray-600 cursor-not-allowed': itemForm.invalid
+            }"
+                class="text-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:focus:ring-blue-800 transition-all">
+                Crear Producto
+            </button>
+
+            <button type="button" (click)="cerrar()"
+                class="bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg text-sm px-5 py-2.5 transition-all">
+                Cerrar
+            </button>
+        </div>
+    </form>
+
+</div>

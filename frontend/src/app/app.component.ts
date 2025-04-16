@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
   // Función que crea un número determinado de pedidos aleatorios
   generateRandomPedidos(numPedidos: number) {
     for (let i = 0; i < numPedidos; i++) {
-      const nuevoPedido: Pedido = this.createRandomPedido();
+      const nuevoPedido = this.createRandomPedido();
       this.totalumPedidosService.createItem(nuevoPedido); // Crea el pedido a través del servicio
     }
   }
@@ -79,7 +79,7 @@ export class AppComponent implements OnInit {
   }
 
   // Función que genera un pedido aleatorio
-  createRandomPedido(): Pedido {
+  createRandomPedido(): any {
     const randomDate = new Date(new Date().getTime() - Math.random() * 10000000000); // Fecha aleatoria
     const numeroPedido = Math.random().toString(36).substring(2, 15); // Genera un número de pedido aleatorio
 
@@ -94,7 +94,7 @@ export class AppComponent implements OnInit {
   }
 
   // Función que genera un producto aleatorio
-  createRandomProducto(): Producto {
+  createRandomProducto(): any {
     return {
       nombre: `Producto ${Math.floor(Math.random() * 1000)}`,
       precio: parseFloat((Math.random() * 500).toFixed(2)), // Precio aleatorio
@@ -104,7 +104,7 @@ export class AppComponent implements OnInit {
   }
 
   // Función que genera un cliente aleatorio
-  createRandomCliente(): Cliente {
+  createRandomCliente(): any {
     const fechaNacimiento = new Date(new Date().getTime() - Math.random() * 10000000000); // Fecha de nacimiento aleatoria
     return {
       nombre: `Cliente ${Math.floor(Math.random() * 1000)}`,

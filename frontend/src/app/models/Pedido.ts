@@ -1,9 +1,10 @@
-// Modelo de la entidad Pedido de la base de datos
+// Modelo de la entidad Pedido
 export interface Pedido {
-    numero_pedido: string;
-    importe: number;
-    importe_impuestos: number;
-    cantidad_productos: number;
-    fecha: string;
-    nombre_cliente: string;
+    id: string,                     // Identificador en la base de datos
+    numero_pedido: string,          // Número de pedido
+    importe: number;                // Importe del pedido
+    importe_impuestos: number;      // Importe con impuestos del pedido
+    cantidad_productos: number;     // Cantidad de productos del pedido
+    fecha: string;                  // Fecha del pedido
+    nombre_cliente: string;         // Nombre del cliente del pedido
 }

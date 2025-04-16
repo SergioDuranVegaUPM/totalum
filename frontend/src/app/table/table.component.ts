@@ -1,9 +1,12 @@
 /*
 TO DO
 
-(1) Poner botones Next/Prev para las páginas
-(2) Añadir botón para eliminar fila
-(3) Añadir botón para agregar fila
+(1) Limpiar app.component.ts
+(2) Separar la funcionalidad de los servicios
+(3) Retomar la config JSON para cabecera de tabla, menú desplegable, título de tabla y botón para añadir, limpiando de paso los pipes que sobren
+(4) Pensar si items debería ser tipo "any[]"
+(5) Añadir funcionalidad para eliminar item
+(6) Añadir funcionalidad para agregar item
 */
 
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
@@ -17,15 +20,18 @@ import { TableNames, TABLES } from '../contants/table-names.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMoon } from '@fortawesome/free-solid-svg-icons';
 import { faSun } from '@fortawesome/free-solid-svg-icons';
+import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faSquarePlus } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 import { CapitalizePipe } from "../pipes/capitalize.pipe";
 import { UnderscoreToSpacePipe } from "../pipes/underscore-to-space.pipe";
 import { AddSymbolPipe } from "../pipes/add-symbol.pipe";
+import { CreateItemComponent } from "../create-item/create-item.component";
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, CapitalizePipe, UnderscoreToSpacePipe, AddSymbolPipe],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, CapitalizePipe, UnderscoreToSpacePipe, AddSymbolPipe, CreateItemComponent],
   templateUrl: './table.component.html',
   styleUrl: './table.component.css'
 })
@@ -35,6 +41,9 @@ export class TableComponent implements OnInit {
   // Iconos de modo oscuro y modo claro
   faMoon = faMoon;
   faSun = faSun;
+  // Iconos para añadir y eliminar ítems
+  faSquarePlus = faSquarePlus;
+  faTrash = faTrash;
 
   // Indica si estamos en modo oscuro (true) o no (false)
   isDarkMode: boolean = false;
@@ -47,10 +56,12 @@ export class TableComponent implements OnInit {
   selectedTable: TableNames = TABLES.PEDIDOS; // Tabla seleccionada para visualizar
   items: Record<string, Pedido[] | Cliente[] | Producto[]> = {}; // Lista de items a mostrar en las tablas
 
-  page = 1; // Página actual de la tabla
-  limit = 10; // Límite de ítems por página
+  page: number = 1; // Página actual de la tabla
+  limit: number = 10; // Límite de ítems por página
 
-  searchTerm = ""; // Término de búsqueda
+  searchTerm: string = ""; // Término de búsqueda
+
+  addItem: boolean = false; // True si el usuario quiere añadir un ítem, en cuyo caso mostramos el popup correspondiente
 
   constructor(private totalumPedidosService: TotalumPedidosService) { }
 
@@ -121,13 +132,29 @@ export class TableComponent implements OnInit {
   }
 
   // Actualiza los ítems mostrados
-  fetchData() {
+  fetchData(step: number) {
+    this.page += step;
     this.getAllItems();
   }
 
   // Actualiza los datos de la tabla según el término de búsqueda
   filter() {
     this.getAllItems();
+  }
+
+  // Elimina el ítem de selectedTable con el id dado como argumento
+  deleteItem(id:string){
+    console.log(id);
+  }
+
+  // Muestra el popup para añadir un ítem
+  openAddItem(){
+    this.addItem = true;
+  }
+
+  // Cierra el popup de creación de ítems
+  onCloseForm(){
+    this.addItem = false;
   }
 
 }

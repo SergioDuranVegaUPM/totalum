@@ -75,14 +75,12 @@ export class TotalumPedidosService {
         }
       });
 
-      console.log("-----------------");
-      console.log(filter, response);
-
       // Mapeamos cada ítem de la respuesta al objeto pertinente
       switch (tableName) {
         case TABLES.PEDIDOS:
           return response.data.data.map((item: any) => {
             return {
+              id: item.id,
               numero_pedido: item.numero_pedido,
               importe: item.importe,
               importe_impuestos: item.importe_impuestos,
@@ -95,6 +93,7 @@ export class TotalumPedidosService {
         case TABLES.CLIENTES:
           return response.data.data.map((item: any) => {
             return {
+              id: item.id,
               nombre: item.nombre,
               fecha_nacimiento: item.fecha_nacimiento.split('T')[0],
               email: item.email,
@@ -105,6 +104,7 @@ export class TotalumPedidosService {
         case TABLES.PRODUCTOS:
           return response.data.data.map((item: any) => {
             return {
+              id: item.id,
               nombre: item.nombre,
               precio: item.precio,
               categoria: item.categoria,
