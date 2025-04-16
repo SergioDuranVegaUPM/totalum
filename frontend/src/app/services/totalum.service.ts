@@ -9,7 +9,7 @@ import { Producto } from '../models/Producto';
   providedIn: 'root'
 })
 
-export class TotalumPedidosService {
+export class TotalumService {
 
   options = {
     apiKey: {
@@ -104,7 +104,7 @@ export class TotalumPedidosService {
         sort: { createdAt: 1 },
         pagination: { page, limit }
       });
-      
+
       // Mapeo de la respuesta al objeto Producto
       return response.data.data.map((item: any) => ({
         id: item.id,
@@ -121,7 +121,7 @@ export class TotalumPedidosService {
   // Crea el pedido dado como parámetro de entrada
   async createPedido(pedido: Omit<Pedido, 'id'>) {
     try {
-      const response = await this.totalumSdk.crud.createItem('pedidos', pedido);
+      await this.totalumSdk.crud.createItem(TABLES.PEDIDOS, pedido);
     } catch (error: any) {
       console.error(error.toString());
       console.error(error?.response?.data);
@@ -131,7 +131,7 @@ export class TotalumPedidosService {
   // Crea un producto dado como parámetro de entrada
   async createProducto(producto: Omit<Producto, 'id'>) {
     try {
-      const response = await this.totalumSdk.crud.createItem('productos', producto);
+      await this.totalumSdk.crud.createItem(TABLES.PRODUCTOS, producto);
     } catch (error: any) {
       console.error(error.toString());
       console.error(error?.response?.data);
@@ -141,7 +141,37 @@ export class TotalumPedidosService {
   // Crea un cliente dado como parámetro de entrada
   async createCliente(cliente: Omit<Cliente, 'id'>) {
     try {
-      const response = await this.totalumSdk.crud.createItem('clientes', cliente);
+      await this.totalumSdk.crud.createItem(TABLES.CLIENTES, cliente);
+    } catch (error: any) {
+      console.error(error.toString());
+      console.error(error?.response?.data);
+    }
+  }
+
+  // Elimina un pedido por ID
+  async deletePedido(id: string) {
+    try {
+      await this.totalumSdk.crud.deleteItemById(TABLES.PEDIDOS, id);
+    } catch (error: any) {
+      console.error(error.toString());
+      console.error(error?.response?.data);
+    }
+  }
+
+  // Elimina un cliente por ID
+  async deleteCliente(id: string) {
+    try {
+      await this.totalumSdk.crud.deleteItemById(TABLES.CLIENTES, id);
+    } catch (error: any) {
+      console.error(error.toString());
+      console.error(error?.response?.data);
+    }
+  }
+
+  // Elimina un producto por ID
+  async deleteProducto(id: string) {
+    try {
+      await this.totalumSdk.crud.deleteItemById(TABLES.PRODUCTOS, id);
     } catch (error: any) {
       console.error(error.toString());
       console.error(error?.response?.data);

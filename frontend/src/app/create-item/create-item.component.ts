@@ -2,6 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { TABLES } from '../contants/table-names.constants';
+import { TotalumService } from '../services/totalum.service';
 
 @Component({
   selector: 'app-create-item',
@@ -13,12 +14,13 @@ import { TABLES } from '../contants/table-names.constants';
 
 export class CreateItemComponent implements OnInit {
   @Input() selectedTable!: string; // Tabla del nuevo ítem
-  @Output() cerrarFormulario = new EventEmitter<boolean>(); // Señal para cerrar el popup
+  @Output() cerrarFormulario = new EventEmitter<boolean>(); // True para informar que se creó un ítem, false en caso de cerrarse el popup sin crear nada
   itemForm!: FormGroup; // Formulario del ítem
 
-  constructor(private fb: FormBuilder) { }
+  constructor(private fb: FormBuilder, private totalumService: TotalumService) { }
 
   ngOnInit(): void {
+    // Dependiendo de la tabla, cargaremos un formulario u otro
     switch (this.selectedTable) {
       case TABLES.PEDIDOS:
         this.itemForm = this.fb.group({
@@ -36,7 +38,7 @@ export class CreateItemComponent implements OnInit {
           nombre: ['', Validators.required],
           fecha_nacimiento: ['', Validators.required],
           email: ['', [Validators.required, Validators.email]],
-          telefono: [0, [Validators.required, Validators.min(100000000)]],
+          telefono: [0, [Validators.required, Validators.min(1)]],
         });
         break;
 
@@ -56,17 +58,53 @@ export class CreateItemComponent implements OnInit {
   }
 
   // Creación del nuevo ítem
-  onSubmit() {
+  async onSubmit() {
     if (this.itemForm.valid) {
       const item = this.itemForm.value;
-      console.log(item);
+      const wasCreated = await this.createItem(item);
+      this.cerrar(wasCreated); // Retornamos a la componente padre el resultado de la operación: creado (true) o no creado (false)
+    }
+    else {
+      this.cerrar(false); // El formulario no era válido, así que nada se creó
     }
   }
 
-  // Informamos a otras componentes de que el popup se cierra
-  cerrar(): void {
+  /*
+  Informamos a otras componentes de que el popup se cierra
+  */
+  cerrar(output: boolean): void {
     this.cerrarFormulario.emit(true);
   }
+
+  /*
+  Crea el nuevo ítem
+  Devuelve true si se creó, false en caso contrario
+  */
+  async createItem(item:any): Promise<boolean> {
+    try {
+      switch (this.selectedTable) {
+        case TABLES.PEDIDOS:
+          await this.totalumService.createPedido(item);
+          return true;
+
+        case TABLES.CLIENTES:
+          await this.totalumService.createCliente(item);
+          return true;
+
+        case TABLES.PRODUCTOS:
+          await this.totalumService.createProducto(item);
+          return true;
+
+        default:
+          console.warn('Tabla no reconocida:', this.selectedTable);
+          return false;
+      }
+    } catch (error) {
+      console.error('Error al crear el ítem:', error);
+      return false;
+    }
+  }
+
 
 }
 

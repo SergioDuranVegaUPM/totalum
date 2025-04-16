@@ -1,14 +1,7 @@
-/*
-TO DO
-
-(1) Añadir funcionalidad para eliminar item
-(2) Añadir funcionalidad para agregar item
-*/
-
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OnInit } from '@angular/core';
-import { TotalumPedidosService } from '../services/totalum-pedidos.service';
+import { TotalumService } from '../services/totalum.service'
 import { TableNames, TABLES } from '../contants/table-names.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMoon } from '@fortawesome/free-solid-svg-icons';
@@ -59,7 +52,7 @@ export class TableComponent implements OnInit {
 
   addItem: boolean = false; // True si el usuario quiere añadir un ítem, en cuyo caso mostramos el popup correspondiente
 
-  constructor(private totalumPedidosService: TotalumPedidosService) { }
+  constructor(private totalumService: TotalumService) { }
 
   // Al iniciar la componente, será la tabla de pedidos la mostrada
   ngOnInit() {
@@ -73,15 +66,15 @@ export class TableComponent implements OnInit {
     // Dependiendo de la nueva selectedTable, llamamos a un servicio u otro
     switch (this.selectedTable) {
       case TABLES.PEDIDOS:
-        this.items = await this.totalumPedidosService.getAllPedidos(page, this.limit, this.searchTerm);
+        this.items = await this.totalumService.getAllPedidos(page, this.limit, this.searchTerm);
         break;
 
       case TABLES.CLIENTES:
-        this.items = await this.totalumPedidosService.getAllClientes(page, this.limit, this.searchTerm);
+        this.items = await this.totalumService.getAllClientes(page, this.limit, this.searchTerm);
         break;
 
       case TABLES.PRODUCTOS:
-        this.items = await this.totalumPedidosService.getAllProductos(page, this.limit, this.searchTerm);
+        this.items = await this.totalumService.getAllProductos(page, this.limit, this.searchTerm);
         break;
 
       default:
@@ -149,8 +142,23 @@ export class TableComponent implements OnInit {
   }
 
   // Elimina el ítem de selectedTable con el id dado como argumento
-  deleteItem(id: string) {
-    console.log(id);
+  async deleteItem(id: string) {
+    // Dependiendo de selectedTable, llamamos a un servicio u otro
+    switch (this.selectedTable) {
+      case TABLES.PEDIDOS:
+        await this.totalumService.deletePedido(id);
+        break;
+
+      case TABLES.CLIENTES:
+        await this.totalumService.deleteCliente(id);
+        break;
+
+      case TABLES.PRODUCTOS:
+        await this.totalumService.deleteProducto(id);
+        break;
+    }
+    // Refrescamos la tabla tras haber quitado un ítem
+    await this.getAllItems();
   }
 
   // Muestra el popup para añadir un ítem
@@ -159,8 +167,12 @@ export class TableComponent implements OnInit {
   }
 
   // Cierra el popup de creación de ítems
-  onCloseForm() {
-    this.addItem = false;
+  async onCloseForm(wasCreated: boolean) {
+    // Si se creó un nuevo ítem, refrescamos la tabla
+    if(wasCreated){
+      await this.getAllItems();
+    }
+    this.addItem = false; // Cerramos popup
   }
 
 }

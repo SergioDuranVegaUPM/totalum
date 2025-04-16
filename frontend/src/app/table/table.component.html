@@ -1,6 +1,6 @@
 <!-- popup para creación de ítems -->
 <div *ngIf="addItem">
-    <app-create-item [selectedTable]="selectedTable" (cerrarFormulario)="onCloseForm()"></app-create-item>
+    <app-create-item [selectedTable]="selectedTable" (cerrarFormulario)="onCloseForm($event)"></app-create-item>
 </div>
 
 <!-- Contenedor principal de la componente.
