@@ -1,21 +1,14 @@
 /*
 TO DO
 
-(1) Limpiar app.component.ts
-(2) Separar la funcionalidad de los servicios
-(3) Retomar la config JSON para cabecera de tabla, menú desplegable, título de tabla y botón para añadir, limpiando de paso los pipes que sobren
-(4) Pensar si items debería ser tipo "any[]"
-(5) Añadir funcionalidad para eliminar item
-(6) Añadir funcionalidad para agregar item
+(1) Añadir funcionalidad para eliminar item
+(2) Añadir funcionalidad para agregar item
 */
 
 import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { OnInit } from '@angular/core';
 import { TotalumPedidosService } from '../services/totalum-pedidos.service';
-import { Producto } from '../models/Producto';
-import { Cliente } from '../models/Cliente';
-import { Pedido } from '../models/Pedido';
 import { TableNames, TABLES } from '../contants/table-names.constants';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { faMoon } from '@fortawesome/free-solid-svg-icons';
@@ -24,19 +17,22 @@ import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faSquarePlus } from '@fortawesome/free-solid-svg-icons';
 import { FormsModule } from '@angular/forms';
 import { CapitalizePipe } from "../pipes/capitalize.pipe";
-import { UnderscoreToSpacePipe } from "../pipes/underscore-to-space.pipe";
 import { AddSymbolPipe } from "../pipes/add-symbol.pipe";
 import { CreateItemComponent } from "../create-item/create-item.component";
+import { columnNames } from '../contants/table-names.constants';
 
 @Component({
   selector: 'app-table',
   standalone: true,
-  imports: [CommonModule, FontAwesomeModule, FormsModule, CapitalizePipe, UnderscoreToSpacePipe, AddSymbolPipe, CreateItemComponent],
+  imports: [CommonModule, FontAwesomeModule, FormsModule, CapitalizePipe, AddSymbolPipe, CreateItemComponent],
   templateUrl: './table.component.html',
   styleUrl: './table.component.css'
 })
 
 export class TableComponent implements OnInit {
+
+  // Nombre de las columnas de cada tabla
+  columnNames = columnNames;
 
   // Iconos de modo oscuro y modo claro
   faMoon = faMoon;
@@ -54,7 +50,7 @@ export class TableComponent implements OnInit {
 
   tableNames: (typeof TABLES)[keyof typeof TABLES][] = Object.values(TABLES); // Contiene los nombres de las tablas
   selectedTable: TableNames = TABLES.PEDIDOS; // Tabla seleccionada para visualizar
-  items: Record<string, Pedido[] | Cliente[] | Producto[]> = {}; // Lista de items a mostrar en las tablas
+  items: any[] = []; // Lista de items a mostrar en las tablas
 
   page: number = 1; // Página actual de la tabla
   limit: number = 10; // Límite de ítems por página
@@ -73,9 +69,25 @@ export class TableComponent implements OnInit {
   // Cogemos los items pertinentes al tipo de tabla en cuestión
   async getAllItems() {
     const page = this.page - 1; // El usuario empieza a contar las páginas desde 1, pero la API desde 0
-    this.items = {}; // Reiniciamos la lista de items antes de coger los nuevos
-    this.items[this.selectedTable] = await this.totalumPedidosService.
-    getAllItems(this.selectedTable, page, this.limit, this.searchTerm);
+
+    // Dependiendo de la nueva selectedTable, llamamos a un servicio u otro
+    switch (this.selectedTable) {
+      case TABLES.PEDIDOS:
+        this.items = await this.totalumPedidosService.getAllPedidos(page, this.limit, this.searchTerm);
+        break;
+
+      case TABLES.CLIENTES:
+        this.items = await this.totalumPedidosService.getAllClientes(page, this.limit, this.searchTerm);
+        break;
+
+      case TABLES.PRODUCTOS:
+        this.items = await this.totalumPedidosService.getAllProductos(page, this.limit, this.searchTerm);
+        break;
+
+      default:
+        this.items[this.selectedTable] = [];
+    }
+
   }
 
   // Cambia el valor de selectedTable a la nueva tabla seleccionada
@@ -83,7 +95,7 @@ export class TableComponent implements OnInit {
     this.selectedTable = table;
     this.page = 1; // Como no sabemos el número de páginas de la nueva tabla, reiniciamos a la primera
     this.searchTerm = "", // Reiniciamos el filtro ante la aparición de una nueva tabla
-    this.getAllItems();
+      this.getAllItems();
     this.menuVisible = false;
   }
 
@@ -103,15 +115,14 @@ export class TableComponent implements OnInit {
 
   // Retorna las columnas del tipo de entidad que hay en la lista de items
   objectKeys(): string[] {
-    return Object.keys(this.items[this.selectedTable][0]);
+    return Object.keys(this.items[0]);
   }
 
   /*
   Retorna true si la tabla ha sido cargada en items y tiene datos que mostrar
   */
   existTable(): boolean {
-    return this.items && Object.keys(this.items).length > 0
-      && this.items[this.selectedTable] && this.items[this.selectedTable].length > 0;
+    return this.items && Object.keys(this.items).length > 0;
   }
 
   // Alterna el valor de isDarkMode y agrega la clase dark al documento
@@ -126,11 +137,6 @@ export class TableComponent implements OnInit {
     }
   }
 
-  // Devuelve los items a visualizar
-  get selectedItems(): any[] {
-    return this.items[this.selectedTable] || [];
-  }
-
   // Actualiza los ítems mostrados
   fetchData(step: number) {
     this.page += step;
@@ -143,17 +149,17 @@ export class TableComponent implements OnInit {
   }
 
   // Elimina el ítem de selectedTable con el id dado como argumento
-  deleteItem(id:string){
+  deleteItem(id: string) {
     console.log(id);
   }
 
   // Muestra el popup para añadir un ítem
-  openAddItem(){
+  openAddItem() {
     this.addItem = true;
   }
 
   // Cierra el popup de creación de ítems
-  onCloseForm(){
+  onCloseForm() {
     this.addItem = false;
   }
 

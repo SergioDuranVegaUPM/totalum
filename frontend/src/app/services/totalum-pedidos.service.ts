@@ -20,109 +20,106 @@ export class TotalumPedidosService {
   totalumSdk = new TotalumApiSdk(this.options);
 
   /*
-  Devuelve todos los items existentes en la tabla "tableName" en la página page de tamaño limit
-  y que cumpla con el término de búsqueda searchTerm (el cual solo se busca en campos de tipo texto)
-  */
-  async getAllItems(tableName: TableNames, page: number, limit: number, searchTerm: string):
-    Promise<Pedido[] | Producto[] | Cliente[]> {
-
-    // Filtro para la búsqueda
-    let filter: any[];
-
-    // Dependiendo de la tabla, el filtro será uno u otro
-    switch (tableName) {
-      case TABLES.PEDIDOS:
-        filter = [
-          { nombre_cliente: { regex: searchTerm, options: 'i' } }
-        ];
-        break;
-
-      case TABLES.CLIENTES:
-        filter = [
-          {
-            or: [
-              { nombre: { regex: searchTerm, options: 'i' } },
-              { email: { regex: searchTerm, options: 'i' } }
-            ]
-          }
-        ];
-        break;
-
-      case TABLES.PRODUCTOS:
-        filter = [
-          {
-            or: [
-              { nombre: { regex: searchTerm, options: 'i' } },
-              { categoria: { regex: searchTerm, options: 'i' } }
-            ]
-          }
-        ];
-        break;
-
-      default:
-        filter = [];
-    }
+  Devuelve todos los pedidos existentes en la página page de tamaño limit
+  y que cumplan con el término de búsqueda searchTerm (busca en nombre_cliente)
+*/
+  async getAllPedidos(page: number, limit: number, searchTerm: string): Promise<Pedido[]> {
+    // Filtro de búsqueda
+    const filter: any[] = [{ nombre_cliente: { regex: searchTerm, options: 'i' } }];
 
     try {
-      const response = await this.totalumSdk.crud.getItems(tableName, {
+      // Llamada a la API
+      const response = await this.totalumSdk.crud.getItems(TABLES.PEDIDOS, {
         filter: filter,
-        sort: {
-          createdAt: 1
-        },
-        pagination: {
-          page: page,
-          limit: limit
-        }
+        sort: { createdAt: 1 },
+        pagination: { page, limit }
       });
 
-      // Mapeamos cada ítem de la respuesta al objeto pertinente
-      switch (tableName) {
-        case TABLES.PEDIDOS:
-          return response.data.data.map((item: any) => {
-            return {
-              id: item.id,
-              numero_pedido: item.numero_pedido,
-              importe: item.importe,
-              importe_impuestos: item.importe_impuestos,
-              cantidad_productos: item.cantidad_productos,
-              fecha: item.fecha.split('T')[0],
-              nombre_cliente: item.nombre_cliente,
-            } as Pedido;
-          });
+      // Mapeo de la respuesta al objeto Pedido
+      return response.data.data.map((item: any) => ({
+        id: item.id,
+        numero_pedido: item.numero_pedido,
+        importe: item.importe,
+        importe_impuestos: item.importe_impuestos,
+        cantidad_productos: item.cantidad_productos,
+        fecha: item.fecha.split('T')[0],
+        nombre_cliente: item.nombre_cliente,
+      } as Pedido));
+    } catch (error: any) {
+      throw error;
+    }
+  }
 
-        case TABLES.CLIENTES:
-          return response.data.data.map((item: any) => {
-            return {
-              id: item.id,
-              nombre: item.nombre,
-              fecha_nacimiento: item.fecha_nacimiento.split('T')[0],
-              email: item.email,
-              telefono: item.telefono
-            } as Cliente;
-          });
+  /*
+  Devuelve todos los clientes existentes en la página page de tamaño limit
+  y que cumplan con el término de búsqueda searchTerm (busca en nombre o email)
+*/
+  async getAllClientes(page: number, limit: number, searchTerm: string): Promise<Cliente[]> {
+    // Filtro de búsqueda
+    const filter: any[] = [{
+      or: [
+        { nombre: { regex: searchTerm, options: 'i' } },
+        { email: { regex: searchTerm, options: 'i' } }
+      ]
+    }];
 
-        case TABLES.PRODUCTOS:
-          return response.data.data.map((item: any) => {
-            return {
-              id: item.id,
-              nombre: item.nombre,
-              precio: item.precio,
-              categoria: item.categoria,
-              cantidad: item.cantidad
-            } as Producto;
-          });
+    // Llamada a la API
+    try {
+      const response = await this.totalumSdk.crud.getItems(TABLES.CLIENTES, {
+        filter,
+        sort: { createdAt: 1 },
+        pagination: { page, limit }
+      });
 
-        default:
-          throw new Error(`Tabla inexistente: ${tableName}`);
-      }
+      // Mapeo de la respuesta al objeto Cliente
+      return response.data.data.map((item: any) => ({
+        id: item.id,
+        nombre: item.nombre,
+        fecha_nacimiento: item.fecha_nacimiento.split('T')[0],
+        email: item.email,
+        telefono: item.telefono
+      } as Cliente));
+    } catch (error: any) {
+      throw error;
+    }
+  }
 
+  /*
+  Devuelve todos los productos existentes en la página page de tamaño limit
+  y que cumplan con el término de búsqueda searchTerm (busca en nombre o categoría)
+*/
+  async getAllProductos(page: number, limit: number, searchTerm: string): Promise<Producto[]> {
+    // Filtro de búsqueda
+    const filter: any[] = [{
+      or: [
+        { nombre: { regex: searchTerm, options: 'i' } },
+        { categoria: { regex: searchTerm, options: 'i' } }
+      ]
+    }];
+
+    // Llamada a la API
+    try {
+      const response = await this.totalumSdk.crud.getItems(TABLES.PRODUCTOS, {
+        filter,
+        sort: { createdAt: 1 },
+        pagination: { page, limit }
+      });
+      
+      // Mapeo de la respuesta al objeto Producto
+      return response.data.data.map((item: any) => ({
+        id: item.id,
+        nombre: item.nombre,
+        precio: item.precio,
+        categoria: item.categoria,
+        cantidad: item.cantidad
+      } as Producto));
     } catch (error: any) {
       throw error;
     }
   }
 
   // Crea el pedido dado como parámetro de entrada
-  async createItem(pedido: Pedido) {
+  async createPedido(pedido: Omit<Pedido, 'id'>) {
     try {
       const response = await this.totalumSdk.crud.createItem('pedidos', pedido);
     } catch (error: any) {
@@ -132,7 +129,7 @@ export class TotalumPedidosService {
   }
 
   // Crea un producto dado como parámetro de entrada
-  async createProducto(producto: Producto) {
+  async createProducto(producto: Omit<Producto, 'id'>) {
     try {
       const response = await this.totalumSdk.crud.createItem('productos', producto);
     } catch (error: any) {
@@ -142,7 +139,7 @@ export class TotalumPedidosService {
   }
 
   // Crea un cliente dado como parámetro de entrada
-  async createCliente(cliente: Cliente) {
+  async createCliente(cliente: Omit<Cliente, 'id'>) {
     try {
       const response = await this.totalumSdk.crud.createItem('clientes', cliente);
     } catch (error: any) {
