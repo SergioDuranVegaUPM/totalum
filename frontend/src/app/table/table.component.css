@@ -1,0 +1,20 @@
+@keyframes fade-in {
+    to {
+        opacity: 1;
+    }
+}
+
+/*
+El mensaje de aviso que informa de la falta de datos
+a veces aparece entre cargas de tablas, pues la lista de
+items puede estar vacía entre esperas de llamadas a la API.
+Así pues, establecemos una espera de 1 segundo para que aparezca
+el aviso antes de mostrarlo.
+
+Es un tip estético, pues evitamos que el usuario vea un cuadro amarillo
+de aviso durante unas centésimas, lo que estéticamente es un destello amarillo
+inquietante
+*/
+.animate-fade-in {
+    animation: fade-in 1s forwards;
+}

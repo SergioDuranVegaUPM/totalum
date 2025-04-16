@@ -1,0 +1,8 @@
+/*Importamos Tailwind al proyecto*/
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*{
+    box-sizing: border-box;
+}
