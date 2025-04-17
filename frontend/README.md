@@ -1,27 +1,62 @@
-# Frontend
+# Frontend Angular
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.3.11.
+Este proyecto es una aplicación frontend desarrollada con **Angular CLI 17.3.16**, **Angular 17.3.12**, **Node.js 18.16.1** y **npm 9.6.4**.
 
-## Development server
+Si desea obviar los requisitos e instalaciones para lanzar la aplicación por usted mismo, acceda a [https://totalum-nine.vercel.app/](https://totalum-nine.vercel.app/) para ver la aplicación en funcionamiento. Este despliegue se ha realizado mediante Vercel.
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+---
 
-## Code scaffolding
+## Requisitos
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Asegúrate de tener instaladas las siguientes herramientas:
 
-## Build
+### 1. Node.js 18.16.1
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+Descárgalo desde:  
+👉 [https://nodejs.org/en/download](https://nodejs.org/en/download)
 
-## Running unit tests
+Esto también instalará automáticamente `npm`.
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+Verifica la instalación:
 
-## Running end-to-end tests
+```bash
+node -v       # Debería mostrar v18.16.1
+npm -v        # Debería mostrar 9.6.4
+```
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### 2. Angular CLI 17.3.16
 
-## Further help
+Instale la versión globalmente con
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+```bash
+npm install -g @angular/cli@17.3.16
+```
+
+Verifique con
+
+```bash
+ng version
+```
+
+## Lanzamiento
+
+### 1. Clone el repositorio
+
+```bash
+git clone https://github.com/SergioDuranVegaUPM/totalum.git
+cd tu-repo/totalum/frontend
+```
+
+### 2. Instale las dependencias
+
+```bash
+npm install
+```
+
+### 3. Lance la aplicación en desarrollo
+
+```bash
+npm serve -o
+```
+
+La aplicación correrá en http://localhost:4200 en tu navegador.
